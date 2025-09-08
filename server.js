@@ -12,7 +12,7 @@ const cors = require('cors');
 const app = express();
 
 // Define a porta do servidor. Ele vai tentar usar a do .env, ou a 3001 como padrão.
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // --- Middlewares Essenciais ---
 
