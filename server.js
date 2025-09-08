@@ -5,8 +5,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// Importa as nossas novas rotas de autenticação
-const authRoutes = require('./routes/auth'); 
+// Importa as nossas novas rotas de autenticação (caminho corrigido)
+const authRoutes = require('./src/routes/auth'); 
 
 // Inicializa a aplicação Express
 const app = express();
@@ -44,4 +44,14 @@ const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => {
     console.log(`Servidor a funcionar na porta ${PORT}`);
 });
+```
+
+**Próximos Passos na sua VPS:**
+
+1.  Atualize o arquivo `server.js` na sua VPS com este novo conteúdo.
+2.  Depois de salvar, reinicie a aplicação com o PM2 para que as alterações tenham efeito:
+
+    ```bash
+    pm2 restart erp-api
+    
 
