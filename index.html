@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Sistema ERP Modular</title>
+    <!-- Tailwind CSS para estilização rápida e moderna -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos personalizados e fallback de fonte */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Efeito de transição suave para feedback visual */
+        .transition-all {
+            transition: all 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900">
+
+    <!-- Container da Página de Login -->
+    <div id="login-container" class="flex flex-col items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-md">
+            <!-- Logo ou Título do Sistema -->
+            <div class="text-center mb-8">
+                <svg class="mx-auto h-12 w-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6M9 11.25h6m-6 4.5h6M5.25 6.75h.008v.008H5.25V6.75zm0 4.5h.008v.008H5.25v-.008zm0 4.5h.008v.008H5.25v-.008zm13.5-9h.008v.008h-.008V6.75zm0 4.5h.008v.008h-.008v-.008zm0 4.5h.008v.008h-.008v-.008z" />
+                </svg>
+                <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">ERP Modular</h1>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Acesse sua conta para gerenciar seu negócio</p>
+            </div>
+
+            <!-- Card do Formulário de Login -->
+            <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8">
+                <form id="login-form" class="space-y-6">
+                    <!-- Campo de Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Endereço de e-mail</label>
+                        <div class="mt-1">
+                            <input id="email" name="email" type="email" autocomplete="email" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Campo de Senha -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Senha</label>
+                        <div class="mt-1">
+                            <input id="password" name="password" type="password" autocomplete="current-password" required
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Opções Adicionais (Esqueci a senha) -->
+                    <div class="flex items-center justify-end">
+                        <div class="text-sm">
+                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                Esqueceu sua senha?
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensagem de Erro (inicialmente oculta) -->
+                    <div id="error-message" class="hidden p-3 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded-md text-sm">
+                        E-mail ou senha inválidos. Tente novamente.
+                    </div>
+
+                    <!-- Botão de Login -->
+                    <div>
+                        <button type="submit"
+                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all">
+                            Entrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Link para Criar Conta -->
+            <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                Não tem uma conta?
+                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
+                    Comece agora
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Container do Dashboard (inicialmente oculto) -->
+    <div id="dashboard-container" class="hidden p-8">
+        <div class="max-w-7xl mx-auto">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Bem-vindo ao Dashboard!</h1>
+            <p class="mt-2 text-gray-600 dark:text-gray-300">Login realizado com sucesso para o e-mail: <span id="user-email" class="font-semibold text-indigo-600 dark:text-indigo-400"></span></p>
+             <p class="mt-4 text-gray-600 dark:text-gray-300">A partir daqui, você poderá adicionar os módulos para cada segmento (Comércio, Clínicas, Salões, etc.).</p>
+             <button id="logout-button" class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800">
+                Sair
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- LÓGICA DE SIMULAÇÃO DE LOGIN ---
+
+        // Elementos do DOM
+        const loginContainer = document.getElementById('login-container');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const loginForm = document.getElementById('login-form');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMessage = document.getElementById('error-message');
+        const userEmailSpan = document.getElementById('user-email');
+        const logoutButton = document.getElementById('logout-button');
+
+        // Adiciona o listener para o envio do formulário
+        loginForm.addEventListener('submit', function(event) {
+            // Previne o comportamento padrão de recarregar a página
+            event.preventDefault();
+
+            // Pega os valores dos campos
+            const email = emailInput.value;
+            const password = passwordInput.value;
+
+            // --- SIMULAÇÃO DE BACKEND ---
+            // Em um sistema real, aqui você faria uma chamada para sua API (backend)
+            // Para este exemplo, vamos usar credenciais fixas.
+            const mockUserEmail = 'admin@erp.com';
+            const mockUserPassword = '123';
+
+            if (email === mockUserEmail && password === mockUserPassword) {
+                // Login bem-sucedido
+                console.log('Login bem-sucedido!');
+                errorMessage.classList.add('hidden'); // Garante que a mensagem de erro está oculta
+
+                // Esconde a tela de login e mostra o dashboard
+                loginContainer.classList.add('hidden');
+                dashboardContainer.classList.remove('hidden');
+
+                // Mostra o e-mail do usuário no dashboard
+                userEmailSpan.textContent = email;
+
+            } else {
+                // Credenciais inválidas
+                console.log('Falha no login. Credenciais inválidas.');
+                
+                // Mostra a mensagem de erro
+                errorMessage.classList.remove('hidden');
+                
+                // Opcional: esconde a mensagem de erro após alguns segundos
+                setTimeout(() => {
+                    errorMessage.classList.add('hidden');
+                }, 4000);
+            }
+        });
+        
+        // Lógica para o botão de Sair (Logout)
+        logoutButton.addEventListener('click', function() {
+            // Esconde o dashboard e mostra a tela de login novamente
+            dashboardContainer.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+            
+            // Limpa os campos do formulário para segurança
+            emailInput.value = '';
+            passwordInput.value = '';
+        });
+
+    </script>
+</body>
+</html>
