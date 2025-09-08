@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Sistema ERP Modular</title>
+    <title>Dashboard | ERP Panificadora</title>
     <!-- Tailwind CSS para estilização rápida e moderna -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,155 +23,541 @@
         .transition-all {
             transition: all 0.3s ease-in-out;
         }
+        /* Para o modal não causar scroll na página */
+        .modal-open {
+            overflow: hidden;
+        }
+        /* Estilos para impressão do cupom fiscal */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #cupom-fiscal-modal, #cupom-fiscal-modal * {
+                visibility: visible;
+            }
+            #cupom-fiscal-modal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                border: none;
+                box-shadow: none;
+                background: white;
+            }
+            #cupom-content {
+                color: black;
+            }
+            .no-print {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900">
 
-    <!-- Container da Página de Login -->
+    <!-- Container da Página de Login (Visível inicialmente) -->
     <div id="login-container" class="flex flex-col items-center justify-center min-h-screen p-4">
         <div class="w-full max-w-md">
-            <!-- Logo ou Título do Sistema -->
             <div class="text-center mb-8">
-                <svg class="mx-auto h-12 w-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6M9 11.25h6m-6 4.5h6M5.25 6.75h.008v.008H5.25V6.75zm0 4.5h.008v.008H5.25v-.008zm0 4.5h.008v.008H5.25v-.008zm13.5-9h.008v.008h-.008V6.75zm0 4.5h.008v.008h-.008v-.008zm0 4.5h.008v.008h-.008v-.008z" />
-                </svg>
-                <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">ERP Modular</h1>
+                <svg class="mx-auto h-12 w-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6M9 11.25h6m-6 4.5h6M5.25 6.75h.008v.008H5.25V6.75zm0 4.5h.008v.008H5.25v-.008zm0 4.5h.008v.008H5.25v-.008zm13.5-9h.008v.008h-.008V6.75zm0 4.5h.008v.008h-.008v-.008zm0 4.5h.008v.008h-.008v-.008z" /></svg>
+                <h1 class="mt-4 text-3xl font-bold tracking-tight text-gray-900 dark:text-white">ERP Panificadora</h1>
                 <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Acesse sua conta para gerenciar seu negócio</p>
             </div>
-
-            <!-- Card do Formulário de Login -->
             <div class="bg-white dark:bg-gray-800 shadow-2xl rounded-2xl p-8">
                 <form id="login-form" class="space-y-6">
-                    <!-- Campo de Email -->
                     <div>
                         <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Endereço de e-mail</label>
                         <div class="mt-1">
-                            <input id="email" name="email" type="email" autocomplete="email" required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all">
+                            <input id="email" name="email" type="email" autocomplete="email" required value="admin@erp.com" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all">
                         </div>
                     </div>
-
-                    <!-- Campo de Senha -->
                     <div>
                         <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Senha</label>
                         <div class="mt-1">
-                            <input id="password" name="password" type="password" autocomplete="current-password" required
-                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all">
+                            <input id="password" name="password" type="password" autocomplete="current-password" required value="123" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white transition-all">
                         </div>
                     </div>
-
-                    <!-- Opções Adicionais (Esqueci a senha) -->
-                    <div class="flex items-center justify-end">
-                        <div class="text-sm">
-                            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-                                Esqueceu sua senha?
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Mensagem de Erro (inicialmente oculta) -->
-                    <div id="error-message" class="hidden p-3 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded-md text-sm">
-                        E-mail ou senha inválidos. Tente novamente.
-                    </div>
-
-                    <!-- Botão de Login -->
-                    <div>
-                        <button type="submit"
-                            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all">
-                            Entrar
-                        </button>
-                    </div>
+                    <div id="error-message" class="hidden p-3 bg-red-100 dark:bg-red-900/50 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-300 rounded-md text-sm">E-mail ou senha inválidos. Tente novamente.</div>
+                    <div><button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all">Entrar</button></div>
                 </form>
             </div>
-            
-            <!-- Link para Criar Conta -->
-            <p class="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                Não tem uma conta?
-                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-                    Comece agora
-                </a>
-            </p>
         </div>
     </div>
 
     <!-- Container do Dashboard (inicialmente oculto) -->
-    <div id="dashboard-container" class="hidden p-8">
-        <div class="max-w-7xl mx-auto">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Bem-vindo ao Dashboard!</h1>
-            <p class="mt-2 text-gray-600 dark:text-gray-300">Login realizado com sucesso para o e-mail: <span id="user-email" class="font-semibold text-indigo-600 dark:text-indigo-400"></span></p>
-             <p class="mt-4 text-gray-600 dark:text-gray-300">A partir daqui, você poderá adicionar os módulos para cada segmento (Comércio, Clínicas, Salões, etc.).</p>
-             <button id="logout-button" class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800">
-                Sair
-            </button>
+    <div id="dashboard-container" class="hidden">
+        <div class="flex h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+            <!-- Sidebar (Menu Lateral) -->
+            <aside class="w-64 flex-shrink-0 bg-white dark:bg-gray-800 border-r dark:border-gray-700 flex flex-col">
+                <div class="h-16 flex items-center justify-center border-b dark:border-gray-700 px-4">
+                     <svg class="h-8 w-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6M9 11.25h6m-6 4.5h6M5.25 6.75h.008v.008H5.25V6.75zm0 4.5h.008v.008H5.25v-.008zm0 4.5h.008v.008H5.25v-.008zm13.5-9h.008v.008h-.008V6.75zm0 4.5h.008v.008h-.008v-.008zm0 4.5h.008v.008h-.008v-.008z" /></svg>
+                    <span class="ml-2 text-xl font-bold">ERP Panificadora</span>
+                </div>
+                <nav class="flex-1 p-4 space-y-2">
+                    <a href="#" data-target="panel-dashboard" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" /></svg>
+                        Dashboard
+                    </a>
+                    <a href="#" data-target="panel-pdv" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75-.75v-.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        PDV
+                    </a>
+                    <a href="#" data-target="panel-whatsapp" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.455.09-.934.09-1.423A8.25 8.25 0 0112 3.75c5.026 0 9 3.134 9 7z" /></svg>
+                        WhatsApp
+                    </a>
+                    <a href="#" data-target="panel-saidas" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" /></svg>
+                        Saídas
+                    </a>
+                    <a href="#" data-target="panel-clientes" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                        Clientes
+                    </a>
+                     <a href="#" data-target="panel-fornecedores" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-17.25 4.5v-1.875a3.375 3.375 0 013.375-3.375h9.75a3.375 3.375 0 013.375 3.375v1.875m-17.25 4.5h16.5M6 6.75h.008v.008H6V6.75zm0 3h.008v.008H6v-.008zm0 3h.008v.008H6v-.008zm-3 3h.008v.008H3v-.008zm3 0h.008v.008H6v-.008zm0-3h.008v.008H6v-.008zm0-3h.008v.008H6V6.75zm3 6h.008v.008H9v-.008zm0-3h.008v.008H9v-.008zm0-3h.008v.008H9V6.75zm3 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm-3-6h.008v.008H9V6.75zm6 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm-3-6h.008v.008h-.008V6.75zm3 0h.008v.008h-.008V6.75zm-3 0h.008v.008H9V6.75zm9 6h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm-3-6h.008v.008h-.008V6.75zm3 0h.008v.008h-.008V6.75zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" /></svg>
+                        Fornecedores
+                    </a>
+                    <a href="#" data-target="panel-produtos" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125A2.25 2.25 0 014.5 4.875h15A2.25 2.25 0 0121.75 7.125v10.5A2.25 2.25 0 0119.5 19.875h-15A2.25 2.25 0 012.25 17.625V7.125z" /></svg>
+                        Produtos
+                    </a>
+                    <a href="#" data-target="panel-relatorios" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" /></svg>
+                        Relatórios
+                    </a>
+                </nav>
+                <div class="p-4 border-t dark:border-gray-700 flex items-center justify-between">
+                     <button id="logout-button" class="flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800">
+                        <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" /></svg>
+                        Sair
+                    </button>
+                    <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+                        <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                        <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM10 18a1 1 0 011-1v-1a1 1 0 11-2 0v1a1 1 0 011 1zM5.05 14.95a1 1 0 01-1.414 0l-.707-.707a1 1 0 011.414-1.414l.707.707a1 1 0 010 1.414zM16.95 5.05a1 1 0 01-1.414 0l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM4 10a1 1 0 01-1-1H2a1 1 0 110-2h1a1 1 0 011 1zM18 10a1 1 0 01-1-1h-1a1 1 0 110-2h1a1 1 0 011 1z" clip-rule="evenodd" fill-rule="evenodd"></path></svg>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Área de Conteúdo Principal -->
+            <main class="flex-1 p-6 overflow-auto">
+                <!-- Painel Dashboard -->
+                <div id="panel-dashboard" class="content-panel">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+                    <p class="mt-1 text-gray-600 dark:text-gray-300">Resumo das atividades da sua panificadora.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"><h3 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Vendas do Dia</h3><p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">R$ 1.250,75</p></div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"><h3 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Novos Clientes Hoje</h3><p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">8</p></div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md"><h3 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Produtos Ativos</h3><p class="text-3xl font-bold text-gray-900 dark:text-white mt-2" id="total-produtos-card">0</p></div>
+                    </div>
+                </div>
+
+                <!-- Painel PDV -->
+                 <div id="panel-pdv" class="content-panel hidden">
+                    <h1 class="text-3xl font-bold mb-6">PDV - Ponto de Venda</h1>
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md"><h2 class="text-xl font-bold mb-4">Selecione os Produtos</h2><div class="mb-4"><input type="text" id="pdv-search-input" placeholder="Buscar produto pelo nome..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"></div><div id="pdv-product-list" class="space-y-4 max-h-[60vh] overflow-y-auto p-1"></div></div>
+                        </div>
+                        <div class="lg:col-span-1">
+                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md flex flex-col h-full"><h2 class="text-xl font-bold mb-4">Carrinho de Compras</h2><div id="pdv-cart-items" class="flex-grow overflow-y-auto mb-4 border-b dark:border-gray-700"></div><div class="space-y-4"><div class="flex justify-between font-bold text-2xl"><span>Total:</span><span id="pdv-cart-total">R$ 0,00</span></div><div class="grid grid-cols-2 gap-2"><button id="cancel-sale-btn" class="w-full px-4 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold">Cancelar</button><button id="finish-sale-btn" class="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold">Finalizar Venda</button></div></div></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Painel WhatsApp -->
+                <div id="panel-whatsapp" class="content-panel hidden">
+                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Integração WhatsApp</h1>
+                    
+                    <!-- Visão Desconectada -->
+                    <div id="whatsapp-disconnected-view" class="mt-6 flex flex-col items-center justify-center bg-white dark:bg-gray-800 p-10 rounded-lg shadow-md">
+                        <svg class="w-16 h-16 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.455.09-.934.09-1.423A8.25 8.25 0 0112 3.75c5.026 0 9 3.134 9 7z" /></svg>
+                        <h2 class="mt-4 text-2xl font-bold">Conecte sua conta do WhatsApp</h2>
+                        <p class="mt-2 text-gray-600 dark:text-gray-400 text-center max-w-md">Responda seus clientes, envie notificações e gerencie conversas diretamente do sistema.</p>
+                        <button id="connect-whatsapp-btn" class="mt-6 px-6 py-3 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition-all">Conectar Agora</button>
+                    </div>
+
+                    <!-- Visão Conectada -->
+                    <div id="whatsapp-connected-view" class="hidden mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden h-[calc(100vh-12rem)]">
+                        <div class="flex h-full">
+                            <!-- Lista de Conversas -->
+                            <div class="w-1/3 border-r dark:border-gray-700 flex flex-col">
+                                <div class="p-4 border-b dark:border-gray-700 font-bold">Conversas</div>
+                                <div id="conversations-list" class="flex-1 overflow-y-auto"></div>
+                            </div>
+                            <!-- Janela de Chat -->
+                            <div class="w-2/3 flex flex-col">
+                                <div id="chat-header" class="p-4 border-b dark:border-gray-700 font-semibold">Selecione uma conversa</div>
+                                <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4"></div>
+                                <div class="p-4 border-t dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
+                                    <form id="send-message-form" class="flex items-center gap-2">
+                                        <input type="text" id="message-input" placeholder="Digite sua mensagem..." class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-full dark:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                        <button type="submit" class="p-3 bg-indigo-600 text-white rounded-full hover:bg-indigo-700">
+                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel Saídas -->
+                <div id="panel-saidas" class="content-panel hidden">
+                    <div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-bold">Controle de Saídas do Caixa</h1><button id="add-saida-btn" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700"><svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>Adicionar Saída</button></div>
+                    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"><table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"><thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Data</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Descrição</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Valor</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th></tr></thead><tbody id="saidas-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody></table></div>
+                </div>
+
+                <!-- Painel Clientes -->
+                <div id="panel-clientes" class="content-panel hidden">
+                    <div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-bold">Gestão de Clientes</h1><button id="add-cliente-btn" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700"><svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>Adicionar Cliente</button></div>
+                    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"><table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"><thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nome</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Telefone</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th></tr></thead><tbody id="clientes-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody></table></div>
+                </div>
+
+                 <!-- Painel Fornecedores -->
+                <div id="panel-fornecedores" class="content-panel hidden">
+                    <div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-bold">Gestão de Fornecedores</h1><button id="add-fornecedor-btn" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700"><svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>Adicionar Fornecedor</button></div>
+                    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"><table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"><thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nome Fantasia</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Contato</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Telefone</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th></tr></thead><tbody id="fornecedores-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody></table></div>
+                </div>
+
+                <!-- Painel Produtos -->
+                <div id="panel-produtos" class="content-panel hidden">
+                    <div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-bold">Gestão de Produtos</h1><button id="add-produto-btn" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700"><svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>Adicionar Produto</button></div>
+                    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"><table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"><thead class="bg-gray-50 dark:bg-gray-700"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nome</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Descrição</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Preço</th><th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ações</th></tr></thead><tbody id="produtos-table-body" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody></table></div>
+                </div>
+
+                <!-- Painel Relatórios -->
+                 <div id="panel-relatorios" class="content-panel hidden">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Relatórios e Gráficos</h1>
+                    <p class="mt-1 text-gray-600 dark:text-gray-300">Análise de performance da sua panificadora.</p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vendas por Categoria</h3>
+                            <div><canvas id="vendasCategoriaChart"></canvas></div>
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Entradas vs. Saídas (Últimos 7 Dias)</h3>
+                            <div><canvas id="fluxoCaixaChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
 
+    <!-- Modal Adicionar Saída -->
+    <div id="add-saida-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"><div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white text-gray-800"><div class="flex justify-between items-center pb-3 border-b"><p class="text-2xl font-bold">Adicionar Saída de Caixa</p><button id="close-saida-modal-btn" class="cursor-pointer z-50 p-2 rounded-full hover:bg-gray-200 text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="mt-5"><form id="add-saida-form" class="space-y-4"><div><label class="block text-sm font-medium">Descrição</label><input type="text" id="saida-descricao" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div><label class="block text-sm font-medium">Valor (R$)</label><input type="number" step="0.01" id="saida-valor" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div class="flex justify-end pt-4 space-x-4 border-t"><button type="button" id="cancel-saida-modal-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Salvar Saída</button></div></form></div></div></div>
+
+    <!-- Modal Adicionar Cliente -->
+    <div id="add-cliente-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"><div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white text-gray-800"><div class="flex justify-between items-center pb-3 border-b"><p class="text-2xl font-bold">Adicionar Novo Cliente</p><button id="close-cliente-modal-btn" class="cursor-pointer z-50 p-2 rounded-full hover:bg-gray-200 text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="mt-5"><form id="add-cliente-form" class="space-y-4"><div><label class="block text-sm font-medium">Nome Completo</label><input type="text" id="cliente-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div><label class="block text-sm font-medium">Email</label><input type="email" id="cliente-email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div><label class="block text-sm font-medium">Telefone</label><input type="tel" id="cliente-telefone" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div class="flex justify-end pt-4 space-x-4 border-t"><button type="button" id="cancel-cliente-modal-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Salvar Cliente</button></div></form></div></div></div>
+    
+    <!-- Modal Adicionar Fornecedor -->
+    <div id="add-fornecedor-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"><div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white text-gray-800"><div class="flex justify-between items-center pb-3 border-b"><p class="text-2xl font-bold">Adicionar Novo Fornecedor</p><button id="close-fornecedor-modal-btn" class="cursor-pointer z-50 p-2 rounded-full hover:bg-gray-200 text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="mt-5"><form id="add-fornecedor-form" class="space-y-4"><div><label class="block text-sm font-medium">Nome Fantasia</label><input type="text" id="fornecedor-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div><label class="block text-sm font-medium">Nome do Contato</label><input type="text" id="fornecedor-contato" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div><label class="block text-sm font-medium">Telefone</label><input type="tel" id="fornecedor-telefone" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div class="flex justify-end pt-4 space-x-4 border-t"><button type="button" id="cancel-fornecedor-modal-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Salvar Fornecedor</button></div></form></div></div></div>
+
+    <!-- Modal Adicionar Produto -->
+    <div id="add-produto-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"><div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white text-gray-800"><div class="flex justify-between items-center pb-3 border-b"><p class="text-2xl font-bold">Adicionar Novo Produto</p><button id="close-produto-modal-btn" class="cursor-pointer z-50 p-2 rounded-full hover:bg-gray-200 text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div><div class="mt-5"><form id="add-produto-form" class="space-y-4"><div><label class="block text-sm font-medium">Nome do Produto</label><input type="text" id="produto-nome" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div><label class="block text-sm font-medium">Descrição</label><textarea id="produto-descricao" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></textarea></div><div><label class="block text-sm font-medium">Preço (R$)</label><input type="number" step="0.01" id="produto-preco" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md bg-white"></div><div class="flex justify-end pt-4 space-x-4 border-t"><button type="button" id="cancel-produto-modal-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">Cancelar</button><button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Salvar Produto</button></div></form></div></div></div>
+
+    <!-- Modal Finalizar Venda -->
+    <div id="finish-sale-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
+            <div class="flex justify-between items-center pb-3 border-b"><p class="text-2xl font-bold text-gray-800">Finalizar Venda</p><button id="close-finish-sale-modal-btn" class="cursor-pointer z-50 p-2 rounded-full hover:bg-gray-200"><svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div>
+            <div class="mt-5 text-gray-800">
+                <div class="mb-4 bg-gray-100 p-4 rounded-lg text-center"><p class="text-lg text-gray-600">Total a Pagar</p><p id="modal-total-value" class="text-4xl font-bold text-gray-900">R$ 0,00</p></div>
+                <div class="mb-4"><label for="sale-customer-select" class="block text-sm font-medium">Cliente</label><select id="sale-customer-select" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"></select></div>
+                <div id="troco-section" class="mb-4 space-y-2"><div><label for="valor-recebido" class="block text-sm font-medium">Valor Recebido</label><input type="number" id="valor-recebido" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Ex: 50.00"></div><div class="bg-gray-100 p-3 rounded-lg text-center"><p class="text-md text-gray-600">Troco</p><p id="troco-valor" class="text-2xl font-bold text-gray-900">R$ 0,00</p></div></div>
+                <div class="mb-6"><p class="font-semibold mb-3 text-center">Selecione a Forma de Pagamento</p><div class="grid grid-cols-2 gap-3"><button class="payment-method-btn w-full p-3 border-2 border-indigo-500 bg-indigo-100 rounded-md font-semibold text-indigo-800" data-method="Dinheiro">Dinheiro</button><button class="payment-method-btn w-full p-3 border-2 border-gray-300 hover:border-indigo-500 rounded-md" data-method="Débito">Débito</button><button class="payment-method-btn w-full p-3 border-2 border-gray-300 hover:border-indigo-500 rounded-md" data-method="Crédito">Crédito</button><button class="payment-method-btn w-full p-3 border-2 border-gray-300 hover:border-indigo-500 rounded-md" data-method="PIX">PIX</button></div></div>
+                 <div class="flex justify-end pt-4 space-x-4 border-t"><button type="button" id="confirm-payment-btn" class="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 text-lg font-bold">Confirmar Pagamento</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Cupom Fiscal -->
+    <div id="cupom-fiscal-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-80 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-10 mx-auto p-5 w-full max-w-xs bg-white rounded-lg">
+            <div id="cupom-content" class="text-xs text-black font-mono space-y-2"></div>
+            <div class="mt-6 flex justify-between gap-2 no-print"><button id="close-cupom-modal-btn" class="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">Fechar</button><button id="print-cupom-btn" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Imprimir</button></div>
+        </div>
+    </div>
 
     <script>
-        // --- LÓGICA DE SIMULAÇÃO DE LOGIN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- LÓGICA DE TEMA (CLARO/ESCURO) ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+            const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
 
-        // Elementos do DOM
-        const loginContainer = document.getElementById('login-container');
-        const dashboardContainer = document.getElementById('dashboard-container');
-        const loginForm = document.getElementById('login-form');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const errorMessage = document.getElementById('error-message');
-        const userEmailSpan = document.getElementById('user-email');
-        const logoutButton = document.getElementById('logout-button');
-
-        // Adiciona o listener para o envio do formulário
-        loginForm.addEventListener('submit', function(event) {
-            // Previne o comportamento padrão de recarregar a página
-            event.preventDefault();
-
-            // Pega os valores dos campos
-            const email = emailInput.value;
-            const password = passwordInput.value;
-
-            // --- SIMULAÇÃO DE BACKEND ---
-            // Em um sistema real, aqui você faria uma chamada para sua API (backend)
-            // Para este exemplo, vamos usar credenciais fixas.
-            const mockUserEmail = 'admin@erp.com';
-            const mockUserPassword = '123';
-
-            if (email === mockUserEmail && password === mockUserPassword) {
-                // Login bem-sucedido
-                console.log('Login bem-sucedido!');
-                errorMessage.classList.add('hidden'); // Garante que a mensagem de erro está oculta
-
-                // Esconde a tela de login e mostra o dashboard
-                loginContainer.classList.add('hidden');
-                dashboardContainer.classList.remove('hidden');
-
-                // Mostra o e-mail do usuário no dashboard
-                userEmailSpan.textContent = email;
-
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                themeToggleLightIcon.classList.remove('hidden');
             } else {
-                // Credenciais inválidas
-                console.log('Falha no login. Credenciais inválidas.');
-                
-                // Mostra a mensagem de erro
-                errorMessage.classList.remove('hidden');
-                
-                // Opcional: esconde a mensagem de erro após alguns segundos
-                setTimeout(() => {
-                    errorMessage.classList.add('hidden');
-                }, 4000);
+                document.documentElement.classList.remove('dark');
+                themeToggleDarkIcon.classList.remove('hidden');
+            }
+
+            themeToggleBtn.addEventListener('click', function() {
+                themeToggleDarkIcon.classList.toggle('hidden');
+                themeToggleLightIcon.classList.toggle('hidden');
+                document.documentElement.classList.toggle('dark');
+                if (document.documentElement.classList.contains('dark')) {
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    localStorage.setItem('color-theme', 'light');
+                }
+                renderCharts(); // Re-render charts on theme change for label colors
+            });
+
+            // --- LÓGICA DE LOGIN ---
+            const loginContainer = document.getElementById('login-container');
+            const dashboardContainer = document.getElementById('dashboard-container');
+            const loginForm = document.getElementById('login-form');
+            loginForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const errorMessage = document.getElementById('error-message');
+
+                try {
+                    // Substitua 'http://84.247.141.144' pelo seu IP ou domínio real
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        localStorage.setItem('authToken', data.token); // Guarda o token
+                        errorMessage.classList.add('hidden');
+                        loginContainer.classList.add('hidden');
+                        dashboardContainer.classList.remove('hidden');
+                        // Renderiza tudo após o login
+                        renderClientesTable();
+                        renderProdutosTable();
+                        renderFornecedoresTable();
+                        renderSaidasTable();
+                        renderPdvProductList();
+                        renderCharts();
+                        renderConversationsList();
+                    } else {
+                        errorMessage.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Erro de conexão:', error);
+                    errorMessage.textContent = 'Erro de conexão com o servidor.';
+                    errorMessage.classList.remove('hidden');
+                }
+            });
+
+            document.getElementById('logout-button').addEventListener('click', function() {
+                localStorage.removeItem('authToken');
+                dashboardContainer.classList.add('hidden');
+                loginContainer.classList.remove('hidden');
+                cancelSale();
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentPanels = document.querySelectorAll('.content-panel');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    navLinks.forEach(navLink => navLink.classList.remove('bg-gray-200', 'dark:bg-gray-700'));
+                    link.classList.add('bg-gray-200', 'dark:bg-gray-700');
+                    const targetId = link.getAttribute('data-target');
+                    contentPanels.forEach(panel => panel.classList.add('hidden'));
+                    document.getElementById(targetId).classList.remove('hidden');
+                });
+            });
+
+            // --- DADOS MOCADOS (Temporário, será substituído por chamadas de API) ---
+            let clientes = [{ id: 1, nome: 'Ana Silva', email: 'ana.silva@example.com', telefone: '(11) 98765-4321' }, { id: 2, nome: 'Bruno Costa', email: 'bruno.costa@example.com', telefone: '(21) 91234-5678' }];
+            let produtos = [{ id: 1, nome: 'Pão Francês (Un)', categoria: 'Pães', preco: 0.75 }, { id: 7, nome: 'Pão Doce', categoria: 'Pães', preco: 4.50 }, { id: 2, nome: 'Bolo de Fubá (Fatia)', categoria: 'Doces', preco: 6.50 }, { id: 5, nome: 'Sonho de Creme', categoria: 'Doces', preco: 7.00 }, { id: 4, nome: 'Pão de Queijo (Un)', categoria: 'Salgados', preco: 3.50 }, { id: 9, nome: 'Coxinha de Frango', categoria: 'Salgados', preco: 8.00 }, { id: 3, nome: 'Café Expresso', categoria: 'Bebidas', preco: 5.00 }, { id: 6, nome: 'Suco de Laranja', categoria: 'Bebidas', preco: 8.00 }];
+            let fornecedores = [{ id: 1, nome: 'Farinha & Cia', contato: 'Sr. Manuel', telefone: '(11) 5555-1234' }, { id: 2, nome: 'Ovos Dourados Granja', contato: 'Dona Benta', telefone: '(19) 5555-4321' }];
+            let saidas = [{ id: 1, data: new Date().toLocaleDateString('pt-BR'), descricao: 'Pagamento conta de luz', valor: 350.50 }, { id: 2, data: new Date().toLocaleDateString('pt-BR'), descricao: 'Compra de sacolas', valor: 80.00 }];
+            let conversas = [
+                { id: 1, nome: 'Ana Silva', ultimaMsg: 'Olá, gostaria de encomendar um bolo.', tempo: '10:45', msgs: [{de: 'cliente', texto: 'Olá, gostaria de encomendar um bolo.'}, {de: 'user', texto: 'Olá Ana, claro! Para quando seria?'}] },
+                { id: 2, nome: 'Bruno Costa', ultimaMsg: 'Meu pedido já saiu para entrega?', tempo: '09:30', msgs: [{de: 'cliente', texto: 'Meu pedido já saiu para entrega?'}] },
+                { id: 3, nome: 'Novo Cliente', ultimaMsg: 'Vocês fazem pão de fermentação natural?', tempo: 'Ontem', msgs: [{de: 'cliente', texto: 'Vocês fazem pão de fermentação natural?'}] }
+            ];
+            let carrinho = [];
+            let currentSaleTotal = 0;
+            let selectedPaymentMethod = 'Dinheiro';
+            let activeChatId = null;
+
+            const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+
+            // --- MÓDULO DE CLIENTES ---
+            const clientesTableBody = document.getElementById('clientes-table-body');
+            const addClienteModal = document.getElementById('add-cliente-modal');
+            const addClienteForm = document.getElementById('add-cliente-form');
+            function renderClientesTable() { clientesTableBody.innerHTML = clientes.map(c => `<tr><td class="px-6 py-4 whitespace-nowrap">${c.nome}</td><td class="px-6 py-4 whitespace-nowrap">${c.email}</td><td class="px-6 py-4 whitespace-nowrap">${c.telefone}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a><a href="#" class="ml-4 text-red-600 hover:text-red-900">Excluir</a></td></tr>`).join(''); }
+            document.getElementById('add-cliente-btn').addEventListener('click', () => addClienteModal.classList.remove('hidden'));
+            const closeClienteModal = () => { addClienteModal.classList.add('hidden'); addClienteForm.reset(); }
+            document.getElementById('close-cliente-modal-btn').addEventListener('click', closeClienteModal);
+            document.getElementById('cancel-cliente-modal-btn').addEventListener('click', closeClienteModal);
+            addClienteForm.addEventListener('submit', (e) => { e.preventDefault(); clientes.push({ id: Date.now(), nome: document.getElementById('cliente-nome').value, email: document.getElementById('cliente-email').value, telefone: document.getElementById('cliente-telefone').value }); renderClientesTable(); closeClienteModal(); });
+            
+            // --- MÓDULO DE FORNECEDORES ---
+            const fornecedoresTableBody = document.getElementById('fornecedores-table-body');
+            const addFornecedorModal = document.getElementById('add-fornecedor-modal');
+            const addFornecedorForm = document.getElementById('add-fornecedor-form');
+            function renderFornecedoresTable() { fornecedoresTableBody.innerHTML = fornecedores.map(f => `<tr><td class="px-6 py-4 whitespace-nowrap">${f.nome}</td><td class="px-6 py-4 whitespace-nowrap">${f.contato}</td><td class="px-6 py-4 whitespace-nowrap">${f.telefone}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a><a href="#" class="ml-4 text-red-600 hover:text-red-900">Excluir</a></td></tr>`).join(''); }
+            document.getElementById('add-fornecedor-btn').addEventListener('click', () => addFornecedorModal.classList.remove('hidden'));
+            const closeFornecedorModal = () => { addFornecedorModal.classList.add('hidden'); addFornecedorForm.reset(); }
+            document.getElementById('close-fornecedor-modal-btn').addEventListener('click', closeFornecedorModal);
+            document.getElementById('cancel-fornecedor-modal-btn').addEventListener('click', closeFornecedorModal);
+            addFornecedorForm.addEventListener('submit', (e) => { e.preventDefault(); fornecedores.push({ id: Date.now(), nome: document.getElementById('fornecedor-nome').value, contato: document.getElementById('fornecedor-contato').value, telefone: document.getElementById('fornecedor-telefone').value }); renderFornecedoresTable(); closeFornecedorModal(); });
+
+            // --- MÓDULO DE SAÍDAS ---
+            const saidasTableBody = document.getElementById('saidas-table-body');
+            const addSaidaModal = document.getElementById('add-saida-modal');
+            const addSaidaForm = document.getElementById('add-saida-form');
+            function renderSaidasTable() { saidasTableBody.innerHTML = saidas.map(s => `<tr><td class="px-6 py-4 whitespace-nowrap">${s.data}</td><td class="px-6 py-4 whitespace-nowrap">${s.descricao}</td><td class="px-6 py-4 whitespace-nowrap text-red-500">-${formatCurrency(s.valor)}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a><a href="#" class="ml-4 text-red-600 hover:text-red-900">Excluir</a></td></tr>`).join(''); }
+            document.getElementById('add-saida-btn').addEventListener('click', () => addSaidaModal.classList.remove('hidden'));
+            const closeSaidaModal = () => { addSaidaModal.classList.add('hidden'); addSaidaForm.reset(); }
+            document.getElementById('close-saida-modal-btn').addEventListener('click', closeSaidaModal);
+            document.getElementById('cancel-saida-modal-btn').addEventListener('click', closeSaidaModal);
+            addSaidaForm.addEventListener('submit', (e) => { e.preventDefault(); saidas.push({ id: Date.now(), data: new Date().toLocaleDateString('pt-BR'), descricao: document.getElementById('saida-descricao').value, valor: parseFloat(document.getElementById('saida-valor').value) }); renderSaidasTable(); closeSaidaModal(); });
+
+            // --- MÓDULO DE PRODUTOS ---
+            const produtosTableBody = document.getElementById('produtos-table-body');
+            const addProdutoModal = document.getElementById('add-produto-modal');
+            const addProdutoForm = document.getElementById('add-produto-form');
+            function renderProdutosTable() {
+                produtosTableBody.innerHTML = produtos.map(p => `<tr><td class="px-6 py-4 whitespace-nowrap">${p.nome}</td><td class="px-6 py-4 whitespace-nowrap">${p.categoria}</td><td class="px-6 py-4 whitespace-nowrap">${formatCurrency(p.preco)}</td><td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"><a href="#" class="text-indigo-600 hover:text-indigo-900">Editar</a><a href="#" class="ml-4 text-red-600 hover:text-red-900">Excluir</a></td></tr>`).join('');
+                document.getElementById('total-produtos-card').textContent = produtos.length;
+                renderPdvProductList();
+            }
+            document.getElementById('add-produto-btn').addEventListener('click', () => addProdutoModal.classList.remove('hidden'));
+            const closeProdutoModal = () => { addProdutoModal.classList.add('hidden'); addProdutoForm.reset(); }
+            document.getElementById('close-produto-modal-btn').addEventListener('click', closeProdutoModal);
+            document.getElementById('cancel-produto-modal-btn').addEventListener('click', closeProdutoModal);
+            addProdutoForm.addEventListener('submit', (e) => { e.preventDefault(); produtos.push({ id: Date.now(), nome: document.getElementById('produto-nome').value, descricao: document.getElementById('produto-descricao').value, categoria: 'Diversos', preco: parseFloat(document.getElementById('produto-preco').value) }); renderProdutosTable(); closeProdutoModal(); });
+
+            // --- MÓDULO PDV ---
+            const pdvProductList = document.getElementById('pdv-product-list');
+            const pdvCartItems = document.getElementById('pdv-cart-items');
+            const pdvCartTotal = document.getElementById('pdv-cart-total');
+            const pdvSearchInput = document.getElementById('pdv-search-input');
+            pdvSearchInput.addEventListener('input', renderPdvProductList);
+            function renderPdvProductList() { const searchTerm = pdvSearchInput.value.toLowerCase(); const filteredProdutos = produtos.filter(p => p.nome.toLowerCase().includes(searchTerm)); const groupedProducts = filteredProdutos.reduce((acc, p) => { (acc[p.categoria] = acc[p.categoria] || []).push(p); return acc; }, {}); pdvProductList.innerHTML = Object.keys(groupedProducts).sort().map(cat => `<h3 class="text-lg font-bold mt-4 first:mt-0">${cat}</h3>` + groupedProducts[cat].map(p => `<div class="flex justify-between items-center bg-gray-50 dark:bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-800" onclick="addToCart(${p.id})"><h3>${p.nome}</h3><p>${formatCurrency(p.preco)}</p></div>`).join('')).join(''); }
+            function renderCart() { let total = 0; pdvCartItems.innerHTML = carrinho.map(item => { total += item.preco * item.quantidade; return `<div class="flex justify-between items-center py-2"><div><p>${item.nome}</p></div><div class="flex items-center gap-2"><button class="px-2" onclick="updateCartQuantity(${item.id}, -1)">-</button><span>${item.quantidade}</span><button class="px-2" onclick="updateCartQuantity(${item.id}, 1)">+</button></div></div>`}).join(''); currentSaleTotal = total; pdvCartTotal.textContent = formatCurrency(total); return total; }
+            window.addToCart = (id) => { const item = carrinho.find(i => i.id === id); if(item) item.quantidade++; else carrinho.push({...produtos.find(p => p.id === id), quantidade: 1}); renderCart(); }
+            window.updateCartQuantity = (id, change) => { const item = carrinho.find(i => i.id === id); if(item) { item.quantidade += change; if(item.quantidade <= 0) carrinho = carrinho.filter(i => i.id !== id); } renderCart(); }
+            const cancelSale = () => { carrinho = []; renderCart(); }
+            document.getElementById('cancel-sale-btn').addEventListener('click', cancelSale);
+            
+            // --- MODAL FINALIZAR VENDA ---
+            const finishSaleModal = document.getElementById('finish-sale-modal');
+            const saleCustomerSelect = document.getElementById('sale-customer-select');
+            document.getElementById('finish-sale-btn').addEventListener('click', () => { if (carrinho.length === 0) return alert('O carrinho está vazio!'); document.getElementById('modal-total-value').textContent = formatCurrency(currentSaleTotal); saleCustomerSelect.innerHTML = '<option value="Cliente Especial">Cliente Especial</option>' + clientes.map(c => `<option value="${c.nome}">${c.nome}</option>`).join(''); finishSaleModal.classList.remove('hidden'); });
+            const closeFinishSaleModal = () => finishSaleModal.classList.add('hidden');
+            document.getElementById('close-finish-sale-modal-btn').addEventListener('click', closeFinishSaleModal);
+            document.querySelectorAll('.payment-method-btn').forEach(btn => btn.addEventListener('click', () => { document.querySelectorAll('.payment-method-btn').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-100')); btn.classList.add('border-indigo-500', 'bg-indigo-100'); selectedPaymentMethod = btn.dataset.method; document.getElementById('troco-section').style.display = selectedPaymentMethod === 'Dinheiro' ? 'block' : 'none'; }));
+            document.getElementById('valor-recebido').addEventListener('input', (e) => { const recebido = parseFloat(e.target.value) || 0; document.getElementById('troco-valor').textContent = formatCurrency(Math.max(0, recebido - currentSaleTotal)); });
+            document.getElementById('confirm-payment-btn').addEventListener('click', () => { const recebido = parseFloat(document.getElementById('valor-recebido').value) || 0; if(selectedPaymentMethod === 'Dinheiro' && recebido < currentSaleTotal) return alert('Valor recebido é menor que o total.'); generateCupom({ customerName: saleCustomerSelect.value, total: currentSaleTotal, paymentMethod: selectedPaymentMethod, items: [...carrinho], received: recebido, change: recebido - currentSaleTotal }); closeFinishSaleModal(); cancelSale(); });
+
+            // --- CUPOM FISCAL ---
+            const cupomFiscalModal = document.getElementById('cupom-fiscal-modal');
+            function generateCupom(saleData) { const now = new Date(); document.getElementById('cupom-content').innerHTML = `<div class="text-center"><p class="font-bold">ERP PANIFICADORA</p><p>Rua Exemplo, 123</p></div><hr class="border-dashed my-1"><p>Cliente: ${saleData.customerName}</p><hr class="border-dashed my-1">${saleData.items.map(i => `<div><p>${i.nome}</p><div class="flex justify-between"><span>${i.quantidade}x${formatCurrency(i.preco)}</span><span>${formatCurrency(i.preco*i.quantidade)}</span></div></div>`).join('')}<hr class="border-dashed my-1"><div class="font-bold flex justify-between"><span>TOTAL</span><span>${formatCurrency(saleData.total)}</span></div><hr class="border-dashed my-1"><div class="flex justify-between"><span>Forma Pagto.</span><span>${saleData.paymentMethod}</span></div>${saleData.paymentMethod==='Dinheiro' ? `<div class="flex justify-between"><span>Recebido</span><span>${formatCurrency(saleData.received)}</span></div><div class="flex justify-between"><span>Troco</span><span>${formatCurrency(saleData.change)}</span></div>` : ''}<hr class="border-dashed my-1"><div class="text-center"><p>${now.toLocaleString('pt-BR')}</p><p>Obrigado!</p></div>`; cupomFiscalModal.classList.remove('hidden'); }
+            const closeCupomModal = () => cupomFiscalModal.classList.add('hidden');
+            document.getElementById('close-cupom-modal-btn').addEventListener('click', closeCupomModal);
+            document.getElementById('print-cupom-btn').addEventListener('click', () => window.print());
+
+            // --- MÓDULO WHATSAPP ---
+            const whatsappDisconnectedView = document.getElementById('whatsapp-disconnected-view');
+            const whatsappConnectedView = document.getElementById('whatsapp-connected-view');
+            const conversationsList = document.getElementById('conversations-list');
+            const chatHeader = document.getElementById('chat-header');
+            const chatMessages = document.getElementById('chat-messages');
+            const sendMessageForm = document.getElementById('send-message-form');
+            const messageInput = document.getElementById('message-input');
+
+            document.getElementById('connect-whatsapp-btn').addEventListener('click', () => {
+                whatsappDisconnectedView.classList.add('hidden');
+                whatsappConnectedView.classList.remove('hidden');
+            });
+
+            function renderConversationsList() {
+                conversationsList.innerHTML = conversas.map(c => `
+                    <div data-id="${c.id}" class="conversation-item flex items-center p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 border-b dark:border-gray-700">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                        <div class="flex-1"><p class="font-semibold">${c.nome}</p><p class="text-sm text-gray-500 dark:text-gray-400 truncate">${c.ultimaMsg}</p></div>
+                        <span class="text-xs text-gray-400">${c.tempo}</span>
+                    </div>
+                `).join('');
+                document.querySelectorAll('.conversation-item').forEach(item => {
+                    item.addEventListener('click', () => openChat(item.dataset.id));
+                });
+            }
+
+            function openChat(id) {
+                activeChatId = parseInt(id);
+                const conversa = conversas.find(c => c.id === activeChatId);
+                chatHeader.textContent = conversa.nome;
+                chatMessages.innerHTML = conversa.msgs.map(msg => `
+                    <div class="flex ${msg.de === 'user' ? 'justify-end' : 'justify-start'}">
+                        <div class="max-w-xs md:max-w-md p-3 rounded-lg ${msg.de === 'user' ? 'bg-indigo-500 text-white' : 'bg-gray-200 dark:bg-gray-600'}">
+                            ${msg.texto}
+                        </div>
+                    </div>
+                `).join('');
+                chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+            }
+
+            sendMessageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = messageInput.value;
+                if (text && activeChatId) {
+                    const conversa = conversas.find(c => c.id === activeChatId);
+                    conversa.msgs.push({ de: 'user', texto: text });
+                    messageInput.value = '';
+                    openChat(activeChatId);
+                }
+            });
+
+            // --- GRÁFICOS ---
+            let vendasCategoriaChartInstance, fluxoCaixaChartInstance;
+            function renderCharts() {
+                const isDarkMode = document.documentElement.classList.contains('dark');
+                const labelColor = isDarkMode ? 'white' : '#374151';
+
+                const chartOptions = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: labelColor }}},
+                    scales: { x: { ticks: { color: labelColor }}, y: { ticks: { color: labelColor }}}
+                };
+
+                if (vendasCategoriaChartInstance) vendasCategoriaChartInstance.destroy();
+                const ctxCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
+                vendasCategoriaChartInstance = new Chart(ctxCategoria, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Pães', 'Doces', 'Salgados', 'Bebidas'],
+                        datasets: [{ label: 'Vendas por Categoria', data: [550.50, 320.75, 410.20, 180.90], backgroundColor: ['#4F46E5', '#7C3AED', '#EC4899', '#F59E0B'], borderRadius: 5 }]
+                    },
+                    options: chartOptions
+                });
+
+                if (fluxoCaixaChartInstance) fluxoCaixaChartInstance.destroy();
+                const ctxFluxoCaixa = document.getElementById('fluxoCaixaChart').getContext('2d');
+                fluxoCaixaChartInstance = new Chart(ctxFluxoCaixa, {
+                    type: 'line',
+                     data: {
+                        labels: ['D-6', 'D-5', 'D-4', 'D-3', 'D-2', 'Ontem', 'Hoje'],
+                        datasets: [
+                            { label: 'Entradas', data: [980, 1100, 1050, 1300, 1250, 1400, 1250.75], borderColor: '#10B981', backgroundColor: '#10B98120', fill: true, tension: 0.3 },
+                            { label: 'Saídas', data: [150, 200, 180, 250, 220, 300, 430.50], borderColor: '#EF4444', backgroundColor: '#EF444420', fill: true, tension: 0.3 }
+                        ]
+                    },
+                    options: chartOptions
+                });
             }
         });
-        
-        // Lógica para o botão de Sair (Logout)
-        logoutButton.addEventListener('click', function() {
-            // Esconde o dashboard e mostra a tela de login novamente
-            dashboardContainer.classList.add('hidden');
-            loginContainer.classList.remove('hidden');
-            
-            // Limpa os campos do formulário para segurança
-            emailInput.value = '';
-            passwordInput.value = '';
-        });
-
     </script>
 </body>
 </html>
+
